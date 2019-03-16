@@ -66,7 +66,7 @@ public class RayTracingMaster : MonoBehaviour
 
     [SerializeField] private ComputeShader RayTracingShader = null;
     [SerializeField] private Camera m_camera = null;
-    [SerializeField] private Texture m_skyboxTexture;
+    [SerializeField] private Texture m_skyboxTexture = null;
 
     private RenderTexture m_target = null;
 

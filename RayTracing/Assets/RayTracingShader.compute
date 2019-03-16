@@ -10,7 +10,7 @@ static const float PI = 3.14159265f;
 
 float2 _PixelOffset;
 
-const float 0.001f;
+const float bias = 0.001f;
 const int reflectionBounces = 8;
 const float skyBoxFactor = 1.2f;
 
@@ -100,7 +100,7 @@ float3 Shade(inout Ray ray, RayHit hit)
 	{
 		float3 specular = float3(0.6f, 0.6f, 0.6f);
 
-		ray.origin = hit.position + hit.normal * bias;
+		ray.origin = hit.position + hit.normal * 0.001f;
 		ray.direction = reflect(ray.direction, hit.normal);
 		ray.energy *= specular;
 
@@ -112,7 +112,7 @@ float3 Shade(inout Ray ray, RayHit hit)
 
 		float theta = acos(ray.direction.y) / -PI;
 		float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-		return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz * skyBoxFactorf;
+		return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
 	}
 }
 
@@ -127,7 +127,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	Ray ray = CreateCameraRay(uv);
 
 	float3 result = float3(0.0f, 0.0f, 0.0f);
-	for (int i = 0; i < reflectionBounces; ++i)
+	for (int i = 0; i < 8; ++i)
 	{
 		RayHit hit = Trace(ray);
 		result += ray.energy * Shade(ray, hit);
