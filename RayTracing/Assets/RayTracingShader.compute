@@ -10,11 +10,16 @@ static const float PI = 3.14159265f;
 
 float2 _PixelOffset;
 
+const float 0.001f;
+const int reflectionBounces = 8;
+const float skyBoxFactor = 1.2f;
+
 
 struct Ray
 {
 	float3 origin;
 	float3 direction;
+	float3 energy;
 };
 
 struct RayHit
@@ -24,20 +29,12 @@ struct RayHit
 	float3 normal;
 };
 
-RayHit CreateRayHit()
-{
-	RayHit hit;
-	hit.position = float3(0.0f, 0.0f, 0.0f);
-	hit.distance = 1.#INF;
-	hit.normal = float3(0.0f, 0.0f, 0.0f);
-	return hit;
-}
-
 Ray CreateRay(float3 origin, float3 direction)
 {
 	Ray ray;
 	ray.origin = origin;
 	ray.direction = direction;
+	ray.energy = float3(1.0f, 1.0f, 1.0f);
 	return ray;
 }
 
@@ -50,6 +47,15 @@ Ray CreateCameraRay(float2 uv)
 	direction = normalize(direction);
 
 	return CreateRay(origin, direction);
+}
+
+RayHit CreateRayHit()
+{
+	RayHit hit;
+	hit.position = float3(0.0f, 0.0f, 0.0f);
+	hit.distance = 1.#INF;
+	hit.normal = float3(0.0f, 0.0f, 0.0f);
+	return hit;
 }
 
 void IntersectGroundPlane(Ray ray, inout RayHit bestHit)
@@ -92,13 +98,21 @@ float3 Shade(inout Ray ray, RayHit hit)
 {
 	if (hit.distance < 1.#INF)
 	{
-		return hit.normal * 0.5f + 0.5f;
+		float3 specular = float3(0.6f, 0.6f, 0.6f);
+
+		ray.origin = hit.position + hit.normal * bias;
+		ray.direction = reflect(ray.direction, hit.normal);
+		ray.energy *= specular;
+
+		return float3(0.0f, 0.0f, 0.0f);
 	}
 	else
 	{
+		ray.energy = 0.0f;
+
 		float theta = acos(ray.direction.y) / -PI;
 		float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-		return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
+		return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz * skyBoxFactorf;
 	}
 }
 
@@ -111,8 +125,16 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	float2 uv = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 	Ray ray = CreateCameraRay(uv);
-	RayHit hit = Trace(ray);
-	float3 result = Shade(ray, hit);
+
+	float3 result = float3(0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < reflectionBounces; ++i)
+	{
+		RayHit hit = Trace(ray);
+		result += ray.energy * Shade(ray, hit);
+
+		if (!any(ray.energy))
+			break;
+	}
 	
 	Result[id.xy] = float4(result, 1.0f);
 }
