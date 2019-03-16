@@ -136,14 +136,19 @@ RayHit Trace(Ray ray)
 {
 	RayHit bestHit = CreateRayHit();
 
-	// Trace ground plane
-	IntersectGroundPlane(ray, bestHit);
+	if (ray.direction.y < 0)
+	{
+		IntersectGroundPlane(ray, bestHit);
+	}
 
-	// Trace spheres
 	uint numSpheres, stride;
 	_Spheres.GetDimensions(numSpheres, stride);
+
 	for (uint i = 0; i < numSpheres; i++)
+	{
 		IntersectSphere(ray, bestHit, i);
+	}
+
 	return bestHit;
 }
 
