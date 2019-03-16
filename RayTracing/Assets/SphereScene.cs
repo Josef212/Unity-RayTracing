@@ -4,6 +4,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SphereScene", menuName = "Scenes/SphereScene")]
 public class SphereScene : ScriptableObject
 {
+    public static Color ReferenceGroundAlbedo = new Color(0.8f, 0.8f, 0.8f);
+    public static Color ReferenceGroundSpecular = new Color(0.03f, 0.03f, 0.03f);
+
     public Vector3 GroundAlbedo { get { return new Vector3(m_groundAlbedo.r, m_groundAlbedo.g, m_groundAlbedo.b); } }
     public Vector3 GroundSpecular { get { return new Vector3(m_groundSpecular.r, m_groundSpecular.g, m_groundSpecular.b); } }
 
@@ -12,6 +15,13 @@ public class SphereScene : ScriptableObject
 
     public bool HasChanged { get; set; } = false;
 
+    [ContextMenu("Reset ground")]
+    public void ResetGround()
+    {
+        m_groundAlbedo = ReferenceGroundAlbedo;
+        m_groundSpecular = ReferenceGroundSpecular;
+        HasChanged = true;
+    }
 
     public bool IsValid()
     {
@@ -49,10 +59,12 @@ public class SphereScene : ScriptableObject
         return spheres;
     }
 
+#if UNITY_EDITOR
     private void OnValidate()
     {
         HasChanged = true;
     }
+#endif
 
 
     [SerializeField] private Vector2 m_sphereRadius = new Vector2(3.0f, 8.0f);
@@ -65,5 +77,5 @@ public class SphereScene : ScriptableObject
 
     [Header("Skybox")]
     [SerializeField] private Texture m_skyboxTexture = null;
-    [SerializeField] private float m_skyboxFactor = 1.2f;
+    [SerializeField] private float m_skyboxFactor = 1.8f;
 }

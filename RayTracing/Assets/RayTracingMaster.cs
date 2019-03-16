@@ -15,6 +15,13 @@ public class RayTracingMaster : MonoBehaviour
         if (m_spheresBuffer != null) m_spheresBuffer.Release();
     }
 
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        m_currentSample = 0;
+    }
+#endif
+
     private void Update()
     {
         if(transform.hasChanged || m_directionalLight.transform.hasChanged)
@@ -136,6 +143,7 @@ public class RayTracingMaster : MonoBehaviour
         m_currentSample = 0;
     }
 
+    [Range(0, 20)]
     [SerializeField] private int m_rayMaxBounces = 8;
     [SerializeField] private ComputeShader RayTracingShader = null;
     [SerializeField] private Camera m_camera = null;

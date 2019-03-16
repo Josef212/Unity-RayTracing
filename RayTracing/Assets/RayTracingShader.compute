@@ -185,7 +185,7 @@ float3 Shade(inout Ray ray, RayHit hit)
 		// Sample the skybox and write it
 		float theta = acos(ray.direction.y) / -PI;
 		float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-		return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz * 1.8f;
+		return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz * _SkyBoxFactor;
 	}
 }
 
@@ -203,7 +203,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 	Ray ray = CreateCameraRay(uv);
 
 	float3 result = float3(0, 0, 0);
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < _ReflectionBounces; i++)
 	{
 		RayHit hit = Trace(ray);
 		result += ray.energy * Shade(ray, hit);
