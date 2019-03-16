@@ -18,6 +18,9 @@ SamplerState sampler_SkyboxTexture;
 float3 _GroundAlbedo;
 float3 _GroundSpecular;
 
+float2 _Pixel;
+float _Seed;
+
 struct Sphere
 {
 	float3 position;
@@ -30,6 +33,43 @@ StructuredBuffer<Sphere> _Spheres;
 
 static const float PI = 3.14159265f;
 static const float bias = 0.001f;
+
+//-------------------------------------
+//- HELPERS
+float rand()
+{
+	float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
+	_Seed += 1.0f;
+	return result;
+}
+
+float3x3 GetTangentSpace(float3 normal)
+{
+	// Choose a helper vector for the cross product
+	float3 helper = float3(1, 0, 0);
+	if (abs(normal.x) > 0.99f)
+		helper = float3(0, 0, 1);
+	// Generate vectors
+	float3 tangent = normalize(cross(normal, helper));
+	float3 binormal = normalize(cross(normal, tangent));
+	return float3x3(tangent, binormal, normal);
+}
+
+float3 SampleHemisphere(float3 normal)
+{
+	// Uniformly sample hemisphere direction
+	float cosTheta = rand();
+	float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
+	float phi = 2 * PI * rand();
+	float3 tangentSpaceDir = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+	// Transform direction to world space
+	return mul(tangentSpaceDir, GetTangentSpace(normal));
+}
+
+float sdot(float3 x, float3 y, float f = 1.0f)
+{
+	return saturate(dot(x, y) * f);
+}
 
 
 //-------------------------------------
@@ -160,14 +200,13 @@ float3 Shade(inout Ray ray, RayHit hit)
 {
 	if (hit.distance < 1.#INF)
 	{
-		// Reflect the ray and multiply energy with specular reflection
-		ray.origin = hit.position + hit.normal * 0.001f;
+		ray.origin = hit.position + hit.normal * bias;
 		ray.direction = reflect(ray.direction, hit.normal);
 		ray.energy *= hit.specular;
 
 		// Shadow test ray
 		bool shadow = false;
-		Ray shadowRay = CreateRay(hit.position + hit.normal * 0.001f, -1 * _DirectionalLight.xyz);
+		Ray shadowRay = CreateRay(hit.position + hit.normal * bias, -1 * _DirectionalLight.xyz);
 		RayHit shadowHit = Trace(shadowRay);
 		if (shadowHit.distance != 1.#INF)
 		{
@@ -196,6 +235,7 @@ float3 Shade(inout Ray ray, RayHit hit)
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
+	_Pixel = id.xy;
 	uint width, height;
 	Result.GetDimensions(width, height);
 

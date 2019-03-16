@@ -77,7 +77,8 @@ public class RayTracingMaster : MonoBehaviour
 
         m_addMaterial.SetFloat("_Sample", m_currentSample);
 
-        Graphics.Blit(m_target, destination, m_addMaterial);
+        Graphics.Blit(m_target, m_converged, m_addMaterial);
+        Graphics.Blit(m_converged, destination);
 
         m_currentSample++;
     }
@@ -98,10 +99,27 @@ public class RayTracingMaster : MonoBehaviour
 
             m_currentSample = 0;
         }
+
+        if (m_converged == null || m_converged.width != Screen.width || m_converged.height != Screen.height)
+        {
+            if (m_converged != null)
+            {
+                m_converged.Release();
+            }
+
+            m_converged = new RenderTexture(Screen.width, Screen.height, 0,
+                RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            m_converged.enableRandomWrite = true;
+            m_converged.Create();
+
+            m_currentSample = 0;
+        }
     }
 
     private void SetShaderParameters()
     {
+        RayTracingShader.SetFloat("_Seed", Random.value);
+
         RayTracingShader.SetTexture(0, "_SkyboxTexture", m_sphereScene.SkyboxTexture);
         RayTracingShader.SetFloat("_SkyBoxFactor", m_sphereScene.SkyboxFactor);
         RayTracingShader.SetInt("_ReflectionBounces", m_rayMaxBounces);
@@ -136,6 +154,8 @@ public class RayTracingMaster : MonoBehaviour
             m_spheresBuffer.Release();
         }
 
+        Random.InitState(m_sphereScene.SceneSeed);
+
         List<Sphere> spheres = m_sphereScene.GetRandomSphereScene();
 
         m_spheresBuffer = new ComputeBuffer(spheres.Count, Sphere.SizeOf);
@@ -152,6 +172,7 @@ public class RayTracingMaster : MonoBehaviour
     [SerializeField] private SphereScene m_sphereScene = null;
 
     private RenderTexture m_target = null;
+    private RenderTexture m_converged = null;
 
     private uint m_currentSample = 0;
     private float m_lastFOV = 0.0f;

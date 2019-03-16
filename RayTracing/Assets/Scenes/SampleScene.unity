@@ -216,7 +216,7 @@ MonoBehaviour:
   RayTracingShader: {fileID: 7200000, guid: c39996cb6fe83604b92d0bd439c7d054, type: 3}
   m_camera: {fileID: 1258482059}
   m_directionalLight: {fileID: 170076734}
-  m_sphereScene: {fileID: 11400000, guid: f73b8a65a0da7914fada47d925e23efe, type: 2}
+  m_sphereScene: {fileID: 11400000, guid: 94887803328175b4985ca34a8d1435ee, type: 2}
 --- !u!4 &1258482058
 Transform:
   m_ObjectHideFlags: 0

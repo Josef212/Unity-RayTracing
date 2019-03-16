@@ -7,6 +7,8 @@ public class SphereScene : ScriptableObject
     public static Color ReferenceGroundAlbedo = new Color(0.8f, 0.8f, 0.8f);
     public static Color ReferenceGroundSpecular = new Color(0.03f, 0.03f, 0.03f);
 
+    public int SceneSeed { get { return m_sceneSeed; } }
+
     public Vector3 GroundAlbedo { get { return new Vector3(m_groundAlbedo.r, m_groundAlbedo.g, m_groundAlbedo.b); } }
     public Vector3 GroundSpecular { get { return new Vector3(m_groundSpecular.r, m_groundSpecular.g, m_groundSpecular.b); } }
 
@@ -66,6 +68,8 @@ public class SphereScene : ScriptableObject
     }
 #endif
 
+
+    [SerializeField] private int m_sceneSeed = 0;
 
     [SerializeField] private Vector2 m_sphereRadius = new Vector2(3.0f, 8.0f);
     [SerializeField] private uint m_spheresMax = 100;
