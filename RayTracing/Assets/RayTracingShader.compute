@@ -15,8 +15,8 @@ float _SkyBoxFactor;
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
 
-static const float PI = 3.14159265f;
-static const float bias = 0.001f;
+float3 _GroundAlbedo;
+float3 _GroundSpecular;
 
 struct Sphere
 {
@@ -27,6 +27,9 @@ struct Sphere
 };
 
 StructuredBuffer<Sphere> _Spheres;
+
+static const float PI = 3.14159265f;
+static const float bias = 0.001f;
 
 
 //-------------------------------------
@@ -99,8 +102,8 @@ void IntersectGroundPlane(Ray ray, inout RayHit bestHit)
 		bestHit.distance = t;
 		bestHit.position = ray.origin + t * ray.direction;
 		bestHit.normal = float3(0.0f, 1.0f, 0.0f);
-		bestHit.albedo = 0.8f;
-		bestHit.specular = 0.03f;
+		bestHit.albedo = _GroundAlbedo;		// 0.8f;
+		bestHit.specular = _GroundSpecular; // 0.03f;
 	}
 }
 

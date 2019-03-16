@@ -23,6 +23,17 @@ public class RayTracingMaster : MonoBehaviour
             transform.hasChanged = false;
             m_directionalLight.transform.hasChanged = false;
         }
+        
+        if(m_camera.fieldOfView != m_lastFOV)
+        {
+            m_currentSample = 0;
+            m_lastFOV = m_camera.fieldOfView;
+        }
+
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            SetUpScene();
+        }
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -75,6 +86,9 @@ public class RayTracingMaster : MonoBehaviour
         RayTracingShader.SetInt("_ReflectionBounces", 8); // TODO: Expose paramter
         RayTracingShader.SetFloat("_SkyBoxFactor", 1.2f); // TODO: Expose paramter
 
+        RayTracingShader.SetVector("_GroundAlbedo", new Vector3(0.8f, 0.8f, 0.8f)); // TODO: Expose paramter
+        RayTracingShader.SetVector("_GroundSpecular", new Vector3(0.03f, 0.03f, 0.03f)); // TODO: Expose paramter
+
         RayTracingShader.SetMatrix("_CameraToWorld", m_camera.cameraToWorldMatrix);
         RayTracingShader.SetMatrix("_CameraInverseProjection", m_camera.projectionMatrix.inverse);
         RayTracingShader.SetTexture(0, "_SkyboxTexture", m_skyboxTexture);
@@ -98,10 +112,16 @@ public class RayTracingMaster : MonoBehaviour
             return;
         }
 
+        if(m_spheresBuffer != null)
+        {
+            m_spheresBuffer.Release();
+        }
+
         List<Sphere> spheres = m_sphereScene.GetRandomSphereScene();
 
         m_spheresBuffer = new ComputeBuffer(spheres.Count, Sphere.SizeOf);
         m_spheresBuffer.SetData(spheres);
+        m_currentSample = 0;
     }
 
     [SerializeField] private ComputeShader RayTracingShader = null;
@@ -114,6 +134,7 @@ public class RayTracingMaster : MonoBehaviour
     private RenderTexture m_target = null;
 
     private uint m_currentSample = 0;
+    private float m_lastFOV = 0.0f;
     private Material m_addMaterial = null;
 
     private ComputeBuffer m_spheresBuffer = null;
