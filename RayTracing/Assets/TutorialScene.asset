@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_sceneSeed: 1223832719
   m_sphereRadius: {x: 5, y: 30}
-  m_spheresMax: 100
+  m_spheresMax: 200
   m_spherePlacementRadius: 200
-  m_groundAlbedo: {r: 0.8, g: 0.8, b: 0.8, a: 1}
-  m_groundSpecular: {r: 0.03, g: 0.03, b: 0.03, a: 1}
+  m_groundAlbedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_groundSpecular: {r: 1, g: 0, b: 0, a: 1}
+  m_groundSmoothness: 0.2
+  m_groundEmission: {r: 0, g: 0, b: 0, a: 1}
   m_skyboxTexture: {fileID: 2800000, guid: ad29fdcbf93ddc9448a9a67be0624963, type: 3}
   m_skyboxFactor: 1.8

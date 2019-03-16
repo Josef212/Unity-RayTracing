@@ -126,6 +126,8 @@ public class RayTracingMaster : MonoBehaviour
 
         RayTracingShader.SetVector("_GroundAlbedo", m_sphereScene.GroundAlbedo);
         RayTracingShader.SetVector("_GroundSpecular", m_sphereScene.GroundSpecular);
+        RayTracingShader.SetFloat("_GroundSmoothness", m_sphereScene.GroundSmoothness);
+        RayTracingShader.SetVector("_GroundEmission", m_sphereScene.GroundEmission);
 
         RayTracingShader.SetMatrix("_CameraToWorld", m_camera.cameraToWorldMatrix);
         RayTracingShader.SetMatrix("_CameraInverseProjection", m_camera.projectionMatrix.inverse);
