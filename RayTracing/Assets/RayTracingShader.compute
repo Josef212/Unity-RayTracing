@@ -55,10 +55,10 @@ float3x3 GetTangentSpace(float3 normal)
 	return float3x3(tangent, binormal, normal);
 }
 
-float3 SampleHemisphere(float3 normal)
+float3 SampleHemisphere(float3 normal, float alpha)
 {
 	// Uniformly sample hemisphere direction
-	float cosTheta = rand();
+	float cosTheta = pow(rand(), 1.0f / (alpha + 1.0f));
 	float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
 	float phi = 2 * PI * rand();
 	float3 tangentSpaceDir = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
@@ -69,6 +69,11 @@ float3 SampleHemisphere(float3 normal)
 float sdot(float3 x, float3 y, float f = 1.0f)
 {
 	return saturate(dot(x, y) * f);
+}
+
+float energy(float3 color)
+{
+	return dot(color, 1.0f / 3.0f);
 }
 
 
@@ -200,14 +205,29 @@ float3 Shade(inout Ray ray, RayHit hit)
 {
 	if (hit.distance < 1.#INF)
 	{
-		// Diffuse shading
+		hit.albedo = min(1.0f - hit.specular, hit.albedo);
+		float specChance = energy(hit.specular);
+		float diffChance = energy(hit.albedo);
+		float sum = specChance + diffChance;
+		specChance /= sum;
+		diffChance /= sum;
+
 		ray.origin = hit.position + hit.normal * bias;
-		float3 reflected = reflect(ray.direction, hit.normal);
-		ray.direction = SampleHemisphere(hit.normal);
-		float3 diffuse = 2 * min(1.0f - hit.specular, hit.albedo);
-		float alpha = 15.0f;
-		float3 specular = hit.specular * (alpha + 2) * pow(sdot(ray.direction, reflected), alpha);
-		ray.energy *= (diffuse + specular) * sdot(hit.normal, ray.direction);
+
+		if (rand() < specChance)
+		{
+			// Specular reflection
+			float alpha = 15.0f;
+			ray.direction = SampleHemisphere(reflect(ray.direction, hit.normal), alpha);
+			float f = (alpha + 2) / (alpha / 1);
+			ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
+		}
+		else
+		{
+			ray.direction = SampleHemisphere(hit.normal, 1.0f);
+			ray.energy *= (1.0f / diffChance) * hit.albedo;
+		}
+		
 		return 0.0f;
 
 
