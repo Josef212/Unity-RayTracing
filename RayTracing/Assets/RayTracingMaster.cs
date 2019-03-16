@@ -20,8 +20,20 @@ public class RayTracingMaster : MonoBehaviour
         if(transform.hasChanged || m_directionalLight.transform.hasChanged)
         {
             m_currentSample = 0;
-            transform.hasChanged = false;
-            m_directionalLight.transform.hasChanged = false;
+            transform.hasChanged = m_directionalLight.transform.hasChanged = false;
+        }
+
+        if(m_sphereScene.HasChanged)
+        {
+            if (!m_sphereScene.IsValid())
+            {
+                Debug.LogError("Scene is no longer valid!");
+                gameObject.SetActive(false);
+                return;
+            }
+            
+            m_currentSample = 0;
+            m_sphereScene.HasChanged = false;
         }
         
         if(m_camera.fieldOfView != m_lastFOV)
@@ -83,15 +95,15 @@ public class RayTracingMaster : MonoBehaviour
 
     private void SetShaderParameters()
     {
-        RayTracingShader.SetInt("_ReflectionBounces", 8); // TODO: Expose paramter
-        RayTracingShader.SetFloat("_SkyBoxFactor", 1.2f); // TODO: Expose paramter
+        RayTracingShader.SetTexture(0, "_SkyboxTexture", m_sphereScene.SkyboxTexture);
+        RayTracingShader.SetFloat("_SkyBoxFactor", m_sphereScene.SkyboxFactor);
+        RayTracingShader.SetInt("_ReflectionBounces", m_rayMaxBounces);
 
-        RayTracingShader.SetVector("_GroundAlbedo", new Vector3(0.8f, 0.8f, 0.8f)); // TODO: Expose paramter
-        RayTracingShader.SetVector("_GroundSpecular", new Vector3(0.03f, 0.03f, 0.03f)); // TODO: Expose paramter
+        RayTracingShader.SetVector("_GroundAlbedo", m_sphereScene.GroundAlbedo);
+        RayTracingShader.SetVector("_GroundSpecular", m_sphereScene.GroundSpecular);
 
         RayTracingShader.SetMatrix("_CameraToWorld", m_camera.cameraToWorldMatrix);
         RayTracingShader.SetMatrix("_CameraInverseProjection", m_camera.projectionMatrix.inverse);
-        RayTracingShader.SetTexture(0, "_SkyboxTexture", m_skyboxTexture);
         RayTracingShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
 
         Vector3 l = m_directionalLight.transform.forward;
@@ -105,9 +117,9 @@ public class RayTracingMaster : MonoBehaviour
 
     private void SetUpScene()
     {
-        if(m_sphereScene == null)
+        if(m_sphereScene == null || !m_sphereScene.IsValid())
         {
-            Debug.LogError("No scene assigned!");
+            Debug.LogError("No scene assigned or it's not valid!");
             gameObject.SetActive(false);
             return;
         }
@@ -124,9 +136,9 @@ public class RayTracingMaster : MonoBehaviour
         m_currentSample = 0;
     }
 
+    [SerializeField] private int m_rayMaxBounces = 8;
     [SerializeField] private ComputeShader RayTracingShader = null;
     [SerializeField] private Camera m_camera = null;
-    [SerializeField] private Texture m_skyboxTexture = null;
     [SerializeField] private Light m_directionalLight = null;
 
     [SerializeField] private SphereScene m_sphereScene = null;
