@@ -61,6 +61,9 @@ public class RayTracingMaster : MonoBehaviour
         RayTracingShader.SetInt("_ReflectionBounces", 8); // TODO: Expose paramter
         RayTracingShader.SetFloat("_SkyBoxFactor", 1.2f); // TODO: Expose paramter
 
+        RayTracingShader.SetInt("_SpheresXCount", 10); // TODO: Expose paramter
+        RayTracingShader.SetInt("_SpheresYCount", 10); // TODO: Expose paramter
+
         RayTracingShader.SetMatrix("_CameraToWorld", m_camera.cameraToWorldMatrix);
         RayTracingShader.SetMatrix("_CameraInverseProjection", m_camera.projectionMatrix.inverse);
         RayTracingShader.SetTexture(0, "_SkyboxTexture", m_skyboxTexture);

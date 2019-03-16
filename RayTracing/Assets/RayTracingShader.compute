@@ -6,14 +6,17 @@ float4x4 _CameraInverseProjection;
 
 Texture2D<float4> _SkyboxTexture;
 SamplerState sampler_SkyboxTexture;
-static const float PI = 3.14159265f;
 
 float2 _PixelOffset;
 
 int _ReflectionBounces;
 float _SkyBoxFactor;
 
-float bias;
+int _SpheresXCount;
+int _SpheresYCount;
+
+static const float PI = 3.14159265f;
+static const float bias = 0.001f;
 
 
 struct Ray
@@ -91,7 +94,21 @@ RayHit Trace(Ray ray)
 {
 	RayHit bestHit = CreateRayHit();
 	IntersectGroundPlane(ray, bestHit);
-	IntersectSphere(ray, bestHit, float4(0, 3.0f, 0, 1.0f));	
+
+	int halfSpheresXCount = ceil(_SpheresXCount / 2);
+	int halfSpheresYCount = ceil(_SpheresYCount / 2);
+
+	for (int x = -halfSpheresXCount; x < halfSpheresXCount; ++x)
+	{
+		for (int y = -halfSpheresYCount; y < halfSpheresYCount; ++y)
+		{
+			float posx = x * (2.0f + 1.0f);
+			float posy = y * (2.0f + 1.0f);
+	
+			IntersectSphere(ray, bestHit, float4(posx, 3.0f, posy, 1.0f));
+		}
+	}
+
 	return bestHit;
 }
 
@@ -120,8 +137,6 @@ float3 Shade(inout Ray ray, RayHit hit)
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-	bias = 0.001f;
-
 	uint width, height;
 	Result.GetDimensions(width, height);
 
