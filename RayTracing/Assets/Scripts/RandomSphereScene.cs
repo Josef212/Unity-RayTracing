@@ -4,7 +4,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "RandomSphereScene", menuName = "Scenes/RandomSphereScene")]
 public class RandomSphereScene : SphereScene
 {
-    
     public override List<Sphere> GetSceneSpheres()
     {
         List<Sphere> spheres = new List<Sphere>();

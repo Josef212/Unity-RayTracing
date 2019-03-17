@@ -13,12 +13,15 @@ MonoBehaviour:
   m_Name: RandomSphereScene0
   m_EditorClassIdentifier: 
   m_sceneSeed: 1223832719
-  m_groundAlbedo: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+  m_saveCameraTransform: 1
+  m_groundAlbedo: {r: 1, g: 1, b: 1, a: 1}
   m_groundSpecular: {r: 0.03, g: 0.03, b: 0.03, a: 1}
-  m_groundSmoothness: 0.2
+  m_groundSmoothness: 1
   m_groundEmission: {r: 0, g: 0, b: 0, a: 1}
   m_skyboxTexture: {fileID: 2800000, guid: ad29fdcbf93ddc9448a9a67be0624963, type: 3}
   m_skyboxFactor: 0.3
+  m_cameraPosition: {x: 215.49663, y: 153.27397, z: -343.7847}
+  m_cameraRotation: {x: -0.2195876, y: 0.2842449, z: -0.06705307, w: -0.93085444}
   m_sphereRadius: {x: 5, y: 30}
   m_spheresMax: 200
   m_spherePlacementRadius: 300
