@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class RayTracingMaster : MonoBehaviour
@@ -28,6 +27,12 @@ public class RayTracingMaster : MonoBehaviour
         {
             m_currentSample = 0;
             transform.hasChanged = m_directionalLight.transform.hasChanged = false;
+            
+            if(m_sphereScene.SaveCameraTransform)
+            {
+                m_sphereScene.m_cameraPosition = transform.position;
+                m_sphereScene.m_cameraRotation = transform.rotation;
+            }
         }
 
         if(m_sphereScene.HasChanged)
@@ -157,6 +162,12 @@ public class RayTracingMaster : MonoBehaviour
         }
 
         Random.InitState(m_sphereScene.SceneSeed);
+
+        if (m_sphereScene.SaveCameraTransform)
+        {
+            transform.position = m_sphereScene.m_cameraPosition;
+            transform.rotation = m_sphereScene.m_cameraRotation;
+        }
 
         List<Sphere> spheres = m_sphereScene.GetSceneSpheres();
 

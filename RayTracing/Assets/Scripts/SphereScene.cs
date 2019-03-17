@@ -3,12 +3,8 @@ using UnityEngine;
 
 public class SphereScene : ScriptableObject
 {
-    public static Color ReferenceGroundAlbedo = new Color(0.8f, 0.8f, 0.8f);
-    public static Color ReferenceGroundSpecular = new Color(0.03f, 0.03f, 0.03f);
-    public static float ReferenceGroundSmoothness = 0.2f;
-    public static Color ReferenceGroundEmission = new Color(0.0f, 0.0f, 0.0f);
-
     public int SceneSeed { get { return m_sceneSeed; } }
+    public bool SaveCameraTransform { get { return m_saveCameraTransform; } }
 
     public Vector3 GroundAlbedo { get { return new Vector3(m_groundAlbedo.r, m_groundAlbedo.g, m_groundAlbedo.b); } }
     public Vector3 GroundSpecular { get { return new Vector3(m_groundSpecular.r, m_groundSpecular.g, m_groundSpecular.b); } }
@@ -50,6 +46,7 @@ public class SphereScene : ScriptableObject
 
 
     [SerializeField] private int m_sceneSeed = 0;
+    [SerializeField] private bool m_saveCameraTransform = false;
     
     [Header("Ground")]
     [SerializeField] private Color m_groundAlbedo = Color.black;
@@ -60,4 +57,12 @@ public class SphereScene : ScriptableObject
     [Header("Skybox")]
     [SerializeField] private Texture m_skyboxTexture = null;
     [SerializeField] private float m_skyboxFactor = 1.8f;
+
+    [HideInInspector] [SerializeField] public Vector3 m_cameraPosition;
+    [HideInInspector] [SerializeField] public Quaternion m_cameraRotation;
+
+    public static Color ReferenceGroundAlbedo = new Color(0.8f, 0.8f, 0.8f);
+    public static Color ReferenceGroundSpecular = new Color(0.03f, 0.03f, 0.03f);
+    public static float ReferenceGroundSmoothness = 0.2f;
+    public static Color ReferenceGroundEmission = new Color(0.0f, 0.0f, 0.0f);
 }
