@@ -158,7 +158,7 @@ public class RayTracingMaster : MonoBehaviour
 
         Random.InitState(m_sphereScene.SceneSeed);
 
-        List<Sphere> spheres = m_sphereScene.GetRandomSphereScene();
+        List<Sphere> spheres = m_sphereScene.GetSceneSpheres();
 
         m_spheresBuffer = new ComputeBuffer(spheres.Count, Sphere.SizeOf);
         m_spheresBuffer.SetData(spheres);

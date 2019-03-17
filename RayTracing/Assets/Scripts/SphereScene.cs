@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "SphereScene", menuName = "Scenes/SphereScene")]
 public class SphereScene : ScriptableObject
 {
     public static Color ReferenceGroundAlbedo = new Color(0.8f, 0.8f, 0.8f);
@@ -32,49 +31,14 @@ public class SphereScene : ScriptableObject
         HasChanged = true;
     }
 
-    public bool IsValid()
+    public virtual bool IsValid()
     {
         return m_skyboxTexture != null;
     }
 
-    public List<Sphere> GetRandomSphereScene()
+    public virtual List<Sphere> GetSceneSpheres()
     {
-        List<Sphere> spheres = new List<Sphere>();
-
-        for (int i = 0; i < m_spheresMax; i++)
-        {
-            Sphere sphere = new Sphere();
-
-            Vector2 randomPos = Random.insideUnitCircle * m_spherePlacementRadius;
-            sphere.radius = m_sphereRadius.x + Random.value * (m_sphereRadius.y - m_sphereRadius.x);
-            sphere.position = new Vector3(randomPos.x, sphere.radius, randomPos.y);
-
-            foreach (Sphere other in spheres)
-            {
-                float minDist = sphere.radius + other.radius;
-                if (Vector3.SqrMagnitude(sphere.position - other.position) < minDist * minDist)
-                    continue;
-            }
-
-            Color color = Random.ColorHSV();
-            float chance = Random.value;
-            if (chance < 0.8f)
-            {
-                bool metal = chance < 0.4f;
-                sphere.albedo = metal ? Vector4.zero : new Vector4(color.r, color.g, color.b);
-                sphere.specular = metal ? new Vector4(color.r, color.g, color.b) : new Vector4(0.04f, 0.04f, 0.04f);
-                sphere.smoothness = Random.value;
-            }
-            else
-            {
-                Color emission = Random.ColorHSV(0, 1, 0, 1, 3.0f, 8.0f);
-                sphere.emission = new Vector3(emission.r, emission.g, emission.b);
-            }
-
-            spheres.Add(sphere);
-        }
-
-        return spheres;
+        throw new System.NotImplementedException("GetSceneSpheres not implemented yet!");
     }
 
 #if UNITY_EDITOR
@@ -86,11 +50,7 @@ public class SphereScene : ScriptableObject
 
 
     [SerializeField] private int m_sceneSeed = 0;
-
-    [SerializeField] private Vector2 m_sphereRadius = new Vector2(3.0f, 8.0f);
-    [SerializeField] private uint m_spheresMax = 100;
-    [SerializeField] private float m_spherePlacementRadius = 100.0f;
-
+    
     [Header("Ground")]
     [SerializeField] private Color m_groundAlbedo = Color.black;
     [SerializeField] private Color m_groundSpecular = Color.black;
